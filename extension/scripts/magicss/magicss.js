@@ -583,8 +583,8 @@
                                 }()),
                                 text: (anyNonWhitespaceCharacterBeforeCurrentCursorPosition ? ('\n' + extraSpaces) : '') +
                                     matchingSelectors[i] + ' {' +
-                                    '\n' + extraSpaces + '    ' +
-                                    '\n' + extraSpaces + '}' +
+                                    '\n' + extraSpaces + '    display: none !important;' +
+                                    '\n' + extraSpaces + '}\n' +
                                     (anyCharacterAfterCurrentCursorPosition ? ('\n' + extraSpaces) : '')
                             };
                         }
@@ -614,14 +614,15 @@
                                 showCSSSelectorMatches(selectedTextOb, window.MagiCSSEditor);
                             });
 
-                            CodeMirror.on(ob, 'pick', function () {
-                                var cursorPos = cm.getCursor();
-                                if (anyCharacterAfterCurrentCursorPosition) {
-                                    cm.setCursor({ line: cursorPos.line - 2 });
-                                } else {
-                                    cm.setCursor({ line: cursorPos.line - 1 });
-                                }
-                            });
+                            // Commenting out temporarily for temporary branch temp-display-none-on-point-and-click
+                            // CodeMirror.on(ob, 'pick', function () {
+                            //     var cursorPos = cm.getCursor();
+                            //     if (anyCharacterAfterCurrentCursorPosition) {
+                            //         cm.setCursor({ line: cursorPos.line - 2 });
+                            //     } else {
+                            //         cm.setCursor({ line: cursorPos.line - 1 });
+                            //     }
+                            // });
 
                             CodeMirror.on(ob, 'close', function () {
                                 window.MagiCSSEditor.styleHighlightingSelector.cssText = '';
