@@ -1,6 +1,9 @@
 /*globals chrome, alert, extLib */
 
-var main = function () {
+var main = function (options) {
+    options = options || {};
+    var applyCSS = options.applyCSS;
+
     var pageType = (document.body.tagName === 'FRAMESET') ? 'FRAMESET' : 'BODY',
         allFrames = (pageType === 'FRAMESET');
 
@@ -15,7 +18,7 @@ var main = function () {
     // Also see: http://stackoverflow.com/questions/7507277/detecting-if-code-is-being-run-as-a-chrome-extension/22563123#22563123
     // var runningInChromeExtension = window.chrome && chrome.runtime && chrome.runtime.id;
 
-    if (!window.openOptionsPageListenerAdded) {
+    if (!window.messageListenerAdded) {
         chrome.runtime.onMessage.addListener(
             function (request, sender, sendResponse) {      // eslint-disable-line no-unused-vars
                 if (request.openOptionsPage) {
@@ -26,9 +29,22 @@ var main = function () {
                         window.open(chrome.runtime.getURL('options.html'));
                     }
                 }
+
+                if (request.getPermissionsForThisUrl) {
+                    chrome.permissions.request(
+                        {
+                            origins: [sender.url]
+                        },
+                        function (granted) {
+                            if (!granted) {
+                                alert('Permission denied.\n\nYou need to provide permissions for activating this feature.');
+                            }
+                        }
+                    );
+                }
             }
         );
-        window.openOptionsPageListenerAdded = true;
+        window.messageListenerAdded = true;
     }
 
     extLib.loadJSCSS([
@@ -111,6 +127,19 @@ var main = function () {
 };
 
 var prerequisitesReady = function (main) {
+
+    if (!window.onUpdatedListenerAdded) {
+        chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+            if(changeInfo.status === 'complete') {
+                chrome.tabs.get(tabId, function (tab) {
+                    // Currently, if you open a link in a new tab (probably for same domain) Magic CSS would reopen in the same tab
+                    main({applyCSS: true});
+                });
+            }
+        });
+    }
+    window.onUpdatedListenerAdded = true;
+
     var TR = extLib.TR;
     if (typeof chrome !== "undefined" && chrome && chrome.browserAction) {
         chrome.browserAction.onClicked.addListener(function (tab) {

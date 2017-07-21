@@ -1050,6 +1050,16 @@ var USER_PREFERENCE_AUTOCOMPLETE_SELECTORS = 'autocomplete-css-selectors';
                         },
                         /* */
                         {
+                            name: 'useStylesOnPageReload',
+                            title: 'Use styles on page reload',
+                            uniqCls: 'use-styles-on-page-reload',
+                            onclick: function (evt, editor) {
+                                // TODO
+                                chrome.runtime.sendMessage({getPermissionsForThisUrl: true});
+                                editor.focus();
+                            }
+                        },
+                        {
                             name: 'showLineNumbers',
                             title: 'Show line numbers',
                             uniqCls: 'magicss-show-line-numbers',
